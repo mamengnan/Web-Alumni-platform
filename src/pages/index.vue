@@ -3,7 +3,7 @@
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
         <div class="ms-title">校友平台登陆</div>
             <el-form-item prop="username">
-                <el-input v-model="ruleForm.username" placeholder="username"></el-input>
+                <el-input v-model="ruleForm.user_name" placeholder="username"></el-input>
             </el-form-item>
             <el-form-item prop="password">
                 <el-input type="password" placeholder="password" v-model="ruleForm.password" @keyup.enter.native="submitForm('ruleForm')"></el-input>
@@ -16,22 +16,23 @@
 </template>
 
 <script>
+import store from './vuex/store.js'
 export default {
   data: function() {
     return {
       ruleForm: {
-        username: "",
+        user_name: "",
         password: ""
       },
       rules: {
-        username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        user_name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }]
       }
     };
   },
   methods: {
     submitForm(formName) {
-      alert("登陆成功!");
+      store.dispatch("LoginTest", this.ruleForm);
     }
   }
 };

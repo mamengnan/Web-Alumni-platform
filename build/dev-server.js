@@ -23,7 +23,7 @@ var proxyTable = config.dev.proxyTable
 
 var app = express()
 
-const wss = new WebSocket.Server({ port: 9090 });
+const wss = new WebSocket.Server({ port: 9093 });
 
 //load the rest API. with db
 require("../server/rest-db-server")(app, wss);
