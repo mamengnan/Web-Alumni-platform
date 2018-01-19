@@ -1,4 +1,4 @@
-![](https://coding.net/u/Blust/p/Server-Alumni-platform/git/raw/master/logo.png)
+![](https://coding.net/u/Blust/p/Web-Alumni-platform/git/raw/master/logo.png)
 # Web-Alumni-platform
 
 校友前端后端代码库，[bug report点这里](https://coding.net/u/Blust/p/Web-Alumni-platform/topic/tag/6051414)
