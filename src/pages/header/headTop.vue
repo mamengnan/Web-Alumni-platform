@@ -18,12 +18,11 @@
 export default {
   data() {
     return {
-      defaultimg: "/static/img/default.jpg",
-      access_token: this.$store.getters.access_token
+      access_token: this.$store.getters.access_token,
+      defaultimg: "/static/img/default.jpg"
     };
   },
   created() {},
-  computed: {},
   methods: {
     controlFullscreen(text, time) {
       var self = this;
