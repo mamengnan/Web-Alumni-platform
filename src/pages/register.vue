@@ -500,7 +500,7 @@ export default {
       this.submit();
     },
     //注册
-    submit() {
+    async submit() {
       if (!this.othermatch[1].test(this.username)) {
         this.checklastselect(0);
       } else if (!this.othermatch[0].test(this.phone)) {
@@ -517,67 +517,48 @@ export default {
           this.checklastselect(3);
         }
       } else {
-        var self = this;
-        this.$store
-          .dispatch("RegisterController", {
+        try {
+          var res = await this.$store.dispatch("RegisterController", {
             user_name: this.username,
             password: this.password,
             phone: this.phone
-          })
-          .then(
-            function(res) {
-              // success
-              if (res.code == 200) {
-                self.controlFullscreen("正在注册中....", 1000).then(function() {
-                  self
-                    .$confirm("注册成功!点击确定后将跳转至登陆界面", "提示", {
-                      confirmButtonText: "确定",
-                      showCancelButton: false,
-                      type: "success",
-                      center: true
-                    })
-                    .then(() => {
-                      self
-                        .controlFullscreen("正在跳转至登陆界面...", 1000)
-                        .then(function() {
-                          self.$router.push("/");
-                        });
-                    })
-                    .catch(() => {
-                      self
-                        .controlFullscreen("正在跳转至登陆界面...", 1000)
-                        .then(function() {
-                          self.$router.push("/");
-                        });
-                    });
-                });
-              } else {
-                self.controlFullscreen("正在注册中....", 1000).then(function() {
-                  self.changeState(
-                    0,
-                    true,
-                    true,
-                    false,
-                    null,
-                    "-4px",
-                    true,
-                    false,
-                    null
-                  );
-                  self.infocontentArray[0] =
-                    "用户名" + self.username + "已存在!";
-                });
-              }
-            },
-            function(res) {
-              self.controlFullscreen("正在注册中....", 1000).then(function() {
-                self.$notify.error({
-                  title: "错误",
-                  message: "服务器异常或者您的网络异常!"
-                });
-              });
-            }
+          });
+        } catch (error) {
+          await this.controlFullscreen("正在注册中....", 1000);
+          this.$notify.error({
+            title: "错误",
+            message: "服务器异常或者您的网络异常!"
+          });
+        }
+        // success
+        if (res.code == 200) {
+          await this.controlFullscreen("正在注册中....", 1000);
+          try {
+            await this.$confirm("注册成功!点击确定后将跳转至登陆界面", "提示", {
+              confirmButtonText: "确定",
+              showCancelButton: false,
+              type: "success",
+              center: true
+            });
+          } catch (error) {
+            await this.controlFullscreen("正在跳转至登陆界面...", 1000);
+            this.$router.push("/");
+          }
+        } else {
+          await this.controlFullscreen("正在注册中....", 1000);
+          this.changeState(
+            0,
+            true,
+            true,
+            false,
+            null,
+            "-4px",
+            true,
+            false,
+            null
           );
+          this.infocontentArray[0] = "用户名" + this.username + "已存在!";
+        }
       }
     },
     back2Home() {

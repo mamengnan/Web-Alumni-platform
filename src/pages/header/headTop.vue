@@ -50,18 +50,14 @@ export default {
         exp.toGMTString();
     },
 
-    handleCommand(command) {
+    async handleCommand(command) {
       if (command == "home") {
         // this.$router.push("/main");
       } else if (command == "singout") {
         this.deleteaccesstoken();
-        var self = this;
-        this.controlFullscreen("您已成功注销,即将跳转至登陆页...", 1000).then(
-          function() {
-            self.$store.commit("clearaccesstoken");
-            self.$router.push("/");
-          }
-        );
+        await this.controlFullscreen("您已成功注销,即将跳转至登陆页...", 1000);
+        this.$store.commit("clearaccesstoken");
+        this.$router.push("/");
       }
     }
   }

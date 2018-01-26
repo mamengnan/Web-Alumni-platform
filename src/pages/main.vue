@@ -62,16 +62,14 @@ export default {
       });
     }
   },
-  mounted() {
+  async mounted() {
     //token失效
     if (this.access_token == "") {
-      var self = this;
-      this.controlFullscreen(
+      await this.controlFullscreen(
         "您的登陆账户已过期,正在跳转至登陆页...",
         2000
-      ).then(function() {
-        self.$router.push("/");
-      });
+      );
+      this.$router.push("/");
     }
   }
 };

@@ -156,7 +156,7 @@ export default {
     dbl_login() {
       this.login();
     },
-    login() {
+    async login() {
       // 如果账户密码不为空
       if (this.loginForm.username == "" || this.loginForm.password == "") {
         this.btn_could_press = false;
@@ -170,39 +170,27 @@ export default {
           this.passwordmatch[3].test(this.loginForm.password))
       ) {
         this.error_input.display = "none";
-        var self = this;
-        this.$store
-          .dispatch("LoginController", {
+        try {
+          var res = await this.$store.dispatch("LoginController", {
             user_name: this.loginForm.username,
             password: this.loginForm.password
-          })
-          .then(
-            function(res) {
-              // success
-              if (res.code == 200) {
-                self.controlFullscreen("正在登陆中....", 1000).then(function() {
-                  self
-                    .controlFullscreen("登陆成功!正在跳转中...", 1000)
-                    .then(function() {
-                      self.$router.push("main");
-                    });
-                });
-              } else {
-                self.controlFullscreen("正在登陆中....", 1000).then(function() {
-                  self.error_input.display = "block";
-                  self.error_input_msg = "账户密码错误!";
-                });
-              }
-            },
-            function(res) {
-              self.controlFullscreen("正在登陆中....", 1000).then(function() {
-                self.$notify.error({
-                  title: "错误",
-                  message: "服务器异常或者您的网络异常!"
-                });
-              });
-            }
-          );
+          });
+        } catch (error) {
+          await this.controlFullscreen("正在登陆中....", 1000);
+          this.$notify.error({
+            title: "错误",
+            message: "服务器异常或者您的网络异常!"
+          });
+        }
+        if (res.code == 200) {
+          await this.controlFullscreen("正在登陆中....", 1000);
+          await this.controlFullscreen("登陆成功!正在跳转中...", 1000);
+          this.$router.push("main");
+        } else {
+          await this.controlFullscreen("正在登陆中....", 1000);
+          this.error_input.display = "block";
+          this.error_input_msg = "账户密码错误!";
+        }
       } else {
         // 账户密码格式有误
         this.error_input.display = "block";
