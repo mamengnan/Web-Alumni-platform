@@ -544,6 +544,8 @@ export default {
             await this.controlFullscreen("正在跳转至登陆界面...", 1000);
             this.$router.push("/");
           }
+          await this.controlFullscreen("正在跳转至登陆界面...", 1000);
+          this.$router.push("/");
         } else {
           await this.controlFullscreen("正在注册中....", 1000);
           this.changeState(
