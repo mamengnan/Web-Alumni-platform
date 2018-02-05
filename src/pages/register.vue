@@ -1,22 +1,23 @@
 <template>
-    <div> 
-        <div class="regist_header clearfix">
-          <div class="wrap">
-              <a href="javascript:void(0);" @click="back2Home" class="logo">
-                  <img src="/static/img/logo.png" height="55" alt="校友平台" />
-              </a>
-              <div class="regist_header_right clearfix">
-                  <!--<a href="#" class="english_edition" id="edition" style="display:none">English</a>-->
-                  <div class="help_wrap">
-                      <a class="hd_menu" href="javascript:void(0);"  @click="unSupportNow()">
-                          <s class="help_ico"></s><span class="fonttype">帮助中心</span>
-                      </a>
-                  </div>
-                  <span class="fr fonttype">您好，欢迎登陆中科大软院校友平台！</span>
-              </div>
-          </div>
-      </div>
-      <input type="hidden" id="validateSig" />
+<div>
+    <div class="regist_header clearfix">
+        <div class="wrap">
+            <a href="javascript:void(0);" @click="back2Home" class="logo">
+                <img src="/static/img/logo.png" height="55" alt="校友平台" />
+            </a>
+            <div class="regist_header_right clearfix">
+                <!--<a href="#" class="english_edition" id="edition" style="display:none">English</a>-->
+                <div class="help_wrap">
+                    <a class="hd_menu" href="javascript:void(0);" @click="unSupportNow()">
+                        <s class="help_ico"></s>
+                        <span class="fonttype">帮助中心</span>
+                    </a>
+                </div>
+                <span class="fr fonttype">您好，欢迎登陆中科大软院校友平台！</span>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="validateSig" />
     <input type="hidden" name="returnUrl" value="http://www.yhd.com" id="returnUrl">
     <input id="p" type="hidden" value="" />
     <input type="password" style="display:none">
@@ -35,9 +36,8 @@
                 <ul class="clearfix">
                     <li v-bind:class="liclassobjAry[0][1]">
                         <div class="y_same_item">
-                            <input v-model="username" class="ysame_input" type="text" id="userName" @click="selectLi(0)"/>
-                            <span class="y_same_label" v-bind:style="liclassobjAry[0][2]">用户名</span>
-
+                            <input v-model="username" class="ysame_input" type="text" id="userName" @click="selectLi(0)" />    
+                              <span class="y_same_label" v-bind:style="liclassobjAry[0][2]">用户名</span>
                         </div>
 
                         <div class="y_regist_tips" v-bind:style="liclassobjAry[0][0]" v-bind:class="liclassobjAry[0][3]">
@@ -53,7 +53,7 @@
 
                     <li v-bind:class="liclassobjAry[1][1]">
                         <div class="y_same_item">
-                            <input v-model="phone" class="ysame_input" type="text" id="phone" @click="selectLi(1)" @keyup.tab="selectLi(1)"/>
+                            <input v-model="phone" class="ysame_input" type="text" id="phone" @click="selectLi(1)" @keyup.tab="selectLi(1)" />
                             <span class="y_same_label" v-bind:style="liclassobjAry[1][2]">手机号</span>
 
                         </div>
@@ -71,8 +71,9 @@
 
                     <li v-bind:class="liclassobjAry[2][1]">
                         <div class="y_same_item">
-                            <input v-model="password" class="ysame_input y_set_password" type="password" oncopy="return false;" oncut="return false;" onpaste="return false;"
-                                autocomplete="off" id="password" @click="selectLi(2)" @keyup="inputpassword" @keyup.tab="selectLi(2)"/>
+                            <input v-model="password" class="ysame_input y_set_password" type="password" oncopy="return false;" oncut="return false;"
+                                onpaste="return false;" autocomplete="off" id="password" @click="selectLi(2)" @keyup="inputpassword"
+                                @keyup.tab="selectLi(2)" />
                             <span class="y_same_label" v-bind:style="liclassobjAry[2][2]">设置密码</span>
                         </div>
                         <div class="y_regist_tips" v-bind:style="liclassobjAry[2][0]" v-bind:class="liclassobjAry[2][3]">
@@ -123,8 +124,8 @@
 
                     <li v-bind:class="liclassobjAry[3][1]">
                         <div class="y_same_item">
-                            <input v-model="twicepassword" class="ysame_input" type="password" oncopy="return false;" oncut="return false;" onpaste="return false;" id="password2"
-                            @click="selectLi(3)" @keyup="twiceinputpassword" @keyup.tab="selectLi(3)"/>
+                            <input v-model="twicepassword" class="ysame_input" type="password" oncopy="return false;" oncut="return false;" onpaste="return false;"
+                                id="password2" @click="selectLi(3)" @keyup="twiceinputpassword" @keyup.tab="selectLi(3)" />
                             <span class="y_same_label" v-bind:style="liclassobjAry[3][2]">确认密码</span>
                         </div>
 
@@ -152,14 +153,13 @@
     <div id="simplefooter">
         <p class="fonttype">Copyright © 中科大软院校友平台 2018，All Rights Reserved</p>
     </div>
-    </div>
+</div>
 </template>
 
 <script>
 export default {
   data: function() {
     return {
-      access_token: this.$store.getters.access_token,
       //手机号正则和账户正则
       othermatch: [
         /^134[0-8]\d{7}$|^13[^4]\d{8}$|^14[5-9]\d{8}$|^15[^4]\d{8}$|^16[6]\d{8}$|^17[0-8]\d{8}$|^18[\d]{9}$|^19[8,9]\d{8}$/,
@@ -271,7 +271,29 @@ export default {
       ]
     };
   },
+  computed: {
+    access_token: function() {
+      return this.$store.getters.access_token;
+    }
+  },
   methods: {
+    // 以服务的方式调用的 Loading
+    serviceFullscreen(text) {
+      return ELEMENT.Loading.service({
+        lock: true,
+        text: text,
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+    },
+    serviceCloseFullscreen(loadingInstance, time) {
+      return new Promise(function(resolve) {
+        setTimeout(() => {
+          loadingInstance.close();
+          resolve();
+        }, time);
+      });
+    },
     controlFullscreen(text, time) {
       var self = this;
       return new Promise(function(resolve) {
@@ -517,6 +539,8 @@ export default {
           this.checklastselect(3);
         }
       } else {
+        // 以服务的方式调用的 Loading
+        var loadingInstance = this.serviceFullscreen("正在注册中....");
         try {
           var res = await this.$store.dispatch("RegisterController", {
             user_name: this.username,
@@ -524,7 +548,8 @@ export default {
             phone: this.phone
           });
         } catch (error) {
-          await this.controlFullscreen("正在注册中....", 1000);
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
+          console.error("RegisterController失败!");
           this.$notify.error({
             title: "错误",
             message: "服务器异常或者您的网络异常!"
@@ -532,7 +557,7 @@ export default {
         }
         // success
         if (res.code == 200) {
-          await this.controlFullscreen("正在注册中....", 1000);
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
           try {
             await this.$confirm("注册成功!点击确定后将跳转至登陆界面", "提示", {
               confirmButtonText: "确定",
@@ -541,13 +566,12 @@ export default {
               center: true
             });
           } catch (error) {
-            await this.controlFullscreen("正在跳转至登陆界面...", 1000);
-            this.$router.push("/");
+            //此处error是对话框选择叉号的时候需要执行的内容
           }
           await this.controlFullscreen("正在跳转至登陆界面...", 1000);
           this.$router.push("/");
         } else {
-          await this.controlFullscreen("正在注册中....", 1000);
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
           this.changeState(
             0,
             true,
@@ -597,12 +621,13 @@ export default {
       this.beforelastchoose = id;
     }
   },
-  mounted() {
+  created() {
     //本地存有accesstoken并且token没有过期
     if (this.access_token != "") {
       this.$router.push("/main");
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 

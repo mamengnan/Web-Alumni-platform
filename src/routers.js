@@ -1,7 +1,14 @@
-import LoginPage from '@/pages/login.vue'
-import MainPage from '@/pages/main.vue'
-import RegisterPage from '@/pages/register.vue'
-import HomePage from '@/pages/home.vue'
+//路由懒加载
+const LoginPage = r => require.ensure([], () => r(require('@/pages/login')))
+const MainPage = r => require.ensure([], () => r(require('@/pages/main')))
+const RegisterPage = r => require.ensure([], () => r(require('@/pages/register')))
+const HomePage = r => require.ensure([], () => r(require('@/pages/home')))
+const ResumePage = r => require.ensure([], () => r(require('@/pages/resume')))
+const EditPersonPage = r => require.ensure([], () => r(require('@/pages/editperson')))
+const PaperPage = r => require.ensure([], () => r(require('@/pages/paper')))
+const InfoBroadCastPage = r => require.ensure([], () => r(require('@/pages/infobroadcast')))
+const ErrorPage = r => require.ensure([], () => r(require('@/pages/error')))
+const BetaInfoPage = r => require.ensure([], () => r(require('@/pages/beta_info')))
 
 
 export default new VueRouter({
@@ -21,12 +28,24 @@ export default new VueRouter({
                 path: '',
                 component: HomePage,
                 meta: [],
+            }, {
+                path: '/edit',
+                component: EditPersonPage,
+                meta: ['个人信息', '编辑个人信息']
             }]
         }, {
             path: '/register',
             name: 'RegisterPage',
             component: RegisterPage
-        }
+        }, {
+            path: '/beta4info',
+            name: 'BetaInfoPage',
+            component: BetaInfoPage
+        }, {
+            path: '/*',
+            name: 'ErrorPage',
+            component: ErrorPage
+        },
     ]
 
 })

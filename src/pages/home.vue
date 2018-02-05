@@ -1,29 +1,55 @@
 <template>
-    <div>
+<div>
     <headTop></headTop>
-		<section class="data_section">
-			<header class="section_title">数据统计</header>
-			<el-row :gutter="20" style="margin-bottom: 10px;">
-                <el-col :span="4"><div class="data_list today_head"><span class="data_num head">当日数据：</span></div></el-col>
-				<el-col :span="4"><div class="data_list"><span class="data_num">{{userCount}}</span> 新增用户</div></el-col>
-				<el-col :span="4"><div class="data_list"><span class="data_num">{{orderCount}}</span> 新增订单</div></el-col>
-                <el-col :span="4"><div class="data_list"><span class="data_num">{{adminCount}}</span> 新增管理员</div></el-col>
-			</el-row>
-            <el-row :gutter="20">
-                <el-col :span="4"><div class="data_list all_head"><span class="data_num head">总数据：</span></div></el-col>
-                <el-col :span="4"><div class="data_list"><span class="data_num">{{allUserCount}}</span> 注册用户</div></el-col>
-                <el-col :span="4"><div class="data_list"><span class="data_num">{{allOrderCount}}</span> 订单</div></el-col>
-                <el-col :span="4"><div class="data_list"><span class="data_num">{{allAdminCount}}</span> 管理员</div></el-col>
-            </el-row>
-		</section>
-        <div class="visitorpie">
-            <div id="visitorpie" class="" style="width: 90%;height:450px;"></div>
-        </div>
+    <section class="data_section">
+        <header class="section_title">数据统计</header>
+        <el-row :gutter="20" style="margin-bottom: 10px;">
+            <el-col :span="4">
+                <div class="data_list today_head">
+                    <span class="data_num head">当日数据：</span>
+                </div>
+            </el-col>
+            <el-col :span="4">
+                <div class="data_list">
+                    <span class="data_num">{{userCount}}</span> 新增用户</div>
+            </el-col>
+            <el-col :span="4">
+                <div class="data_list">
+                    <span class="data_num">{{orderCount}}</span> 新增订单</div>
+            </el-col>
+            <el-col :span="4">
+                <div class="data_list">
+                    <span class="data_num">{{adminCount}}</span> 新增管理员</div>
+            </el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="4">
+                <div class="data_list all_head">
+                    <span class="data_num head">总数据：</span>
+                </div>
+            </el-col>
+            <el-col :span="4">
+                <div class="data_list">
+                    <span class="data_num">{{allUserCount}}</span> 注册用户</div>
+            </el-col>
+            <el-col :span="4">
+                <div class="data_list">
+                    <span class="data_num">{{allOrderCount}}</span> 订单</div>
+            </el-col>
+            <el-col :span="4">
+                <div class="data_list">
+                    <span class="data_num">{{allAdminCount}}</span> 管理员</div>
+            </el-col>
+        </el-row>
+    </section>
+    <div class="visitorpie">
+        <div id="visitorpie" class="" style="width: 90%;height:450px;"></div>
     </div>
+</div>
 </template>
 
 <script>
-import headTop from "./header/headTop";
+import headTop from "./header/headTop.vue";
 export default {
   data() {
     return {
@@ -53,45 +79,45 @@ export default {
   computed: {},
   methods: {
     initData() {
-        const option = {
-          title: {
-            text: "科大软院校友分布图",
-            subtext: "数据来源仅供参考",
-            x: "center"
-          },
-          tooltip: {
-            trigger: "item",
-            formatter: "{a} <br/>{b} : {c} ({d}%)"
-          },
-          legend: {
-            orient: "vertical",
-            left: "left",
-            data: ["北京", "上海", "深圳", "杭州", "广州","其他"]
-          },
-          series: [
-            {
-              name: "区域/人数/比例",
-              type: "pie",
-              radius: "55%",
-              center: ["50%", "60%"],
-              data: [
-                { value: this.pieData.beijing, name: "北京" },
-                { value: this.pieData.shanghai, name: "上海" },
-                { value: this.pieData.shenzhen, name: "深圳" },
-                { value: this.pieData.hangzhou, name: "杭州" },
-                { value: this.pieData.guangzhou, name: "广州" },
-                { value: this.pieData.qita, name: "其他" }
-              ],
-              itemStyle: {
-                emphasis: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: "rgba(0, 0, 0, 0.5)"
-                }
+      const option = {
+        title: {
+          text: "科大软院校友分布图",
+          subtext: "数据来源仅供参考",
+          x: "center"
+        },
+        tooltip: {
+          trigger: "item",
+          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+          orient: "vertical",
+          left: "left",
+          data: ["北京", "上海", "深圳", "杭州", "广州", "其他"]
+        },
+        series: [
+          {
+            name: "区域/人数/比例",
+            type: "pie",
+            radius: "55%",
+            center: ["50%", "60%"],
+            data: [
+              { value: this.pieData.beijing, name: "北京" },
+              { value: this.pieData.shanghai, name: "上海" },
+              { value: this.pieData.shenzhen, name: "深圳" },
+              { value: this.pieData.hangzhou, name: "杭州" },
+              { value: this.pieData.guangzhou, name: "广州" },
+              { value: this.pieData.qita, name: "其他" }
+            ],
+            itemStyle: {
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)"
               }
             }
-          ]
-        };
+          }
+        ]
+      };
       this.myChart.setOption(option);
     }
   }

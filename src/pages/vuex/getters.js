@@ -1,3 +1,5 @@
+import state from './state';
+
 var axios = require('../axios');
 
 const getters = {
@@ -14,6 +16,15 @@ const getters = {
             }
         }
         return state.access_token;
+    },
+    formData: (state) => {
+        return state.formData;
+    },
+    img_bs64_url: (state) => {
+        return state.img_bs64_url;
+    },
+    isNewUser: (state) => {
+        return state.isNewUser;
     }
 };
 

@@ -1,9 +1,113 @@
 let axios = require("../axios");
-
-var API_LEARNWARE_ROUTER = "/db/learnware";
-
+import store from './store';
 
 const actions = {
+    // 提交个人信息控制器
+    SubmitPfoController({
+        commit
+    }, item) {
+        return new Promise(async (on_result, on_error) => {
+            try {
+                item.user_id = JSON.parse(atob(store.getters.access_token.split(".")[0])).user_id;
+                var response = await axios({
+                    url: "/api/userinfo",
+                    method: 'post',
+                    data: item,
+                    headers: {
+                        'content-type': 'application/json',
+                        'authorization': store.getters.access_token
+                    }
+                });
+                if (response.data.code == 200) {
+                    on_result({
+                        code: 200
+                    });
+                } else {
+                    on_result({
+                        code: response.data.code
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                on_error({
+                    code: 999
+                });
+            }
+        });
+    },
+
+    // 更改用户基本信息控制器
+    UpdatePfoController({
+        commit
+    }, item) {
+        return new Promise(async (on_result, on_error) => {
+            try {
+                item.user_id = JSON.parse(atob(store.getters.access_token.split(".")[0])).user_id;
+                var response = await axios({
+                    url: "/api/userinfo",
+                    method: 'put',
+                    data: item,
+                    headers: {
+                        'content-type': 'application/json',
+                        'authorization': store.getters.access_token
+                    }
+                });
+                if (response.data.code == 200) {
+                    on_result({
+                        code: 200
+                    });
+                } else {
+                    on_result({
+                        code: response.data.code
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                on_error({
+                    code: 999
+                });
+            }
+        });
+    },
+
+    // 获取用户基本信息控制器
+    GetUserInfoController({
+        commit
+    }, item) {
+        return new Promise(async (on_result, on_error) => {
+            try {
+                var response = await axios({
+                    url: "/api/userinfo",
+                    method: 'get',
+                    params: {
+                        id: JSON.parse(atob(store.getters.access_token.split(".")[0])).user_id,
+                        return_body: item
+                    },
+                    headers: {
+                        'content-type': 'application/json',
+                        'authorization': store.getters.access_token
+                    }
+                });
+                if (response.data.code == 200) {
+                    if (item) {
+                        commit('setuserinfocontroller', response.data);
+                    }
+                    on_result({
+                        code: 200
+                    });
+                } else {
+                    on_result({
+                        code: response.data.code
+                    });
+                }
+            } catch (error) {
+                on_error({
+                    code: 999
+                });
+            }
+        });
+    },
+
     // 登陆控制器
     LoginController({
         commit
@@ -22,7 +126,7 @@ const actions = {
                     });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 on_error({
                     code: 999
                 });
@@ -47,7 +151,7 @@ const actions = {
                     });
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 on_error({
                     code: 999
                 });

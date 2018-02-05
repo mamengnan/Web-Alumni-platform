@@ -1,32 +1,35 @@
 <template>
-    <div> 
-      <div class="regist_header clearfix">
-          <div class="wrap">
-              <a href="javascript:void(0);" class="logo">
-                  <img src="/static/img/logo.png" height="55" alt="校友平台" />
-              </a>
-              <div class="regist_header_right clearfix">
-                  <!--<a href="#" class="english_edition" id="edition" style="display:none">English</a>-->
-                  <div class="help_wrap">
-                      <a class="hd_menu" href="javascript:void(0);"  @click="unSupportNow()">
-                          <s class="help_ico"></s><span class="fonttype">帮助中心</span>
-                      </a>
-                  </div>
-                  <span class="fr fonttype">您好，欢迎登陆中科大软院校友平台！</span>
-              </div>
-          </div>
-      </div>
-      <input type="hidden" id="isAutoLogin" value="0" />
-      <input type="hidden" id="autoLoginFlag" value="1" />
-      <input type="hidden" id="uuid">
-      <div class="login_wrap">
+<div>
+    <div class="regist_header clearfix">
+        <div class="wrap">
+            <a href="javascript:void(0);" class="logo">
+                <img src="/static/img/logo.png" height="55" alt="校友平台" />
+            </a>
+            <div class="regist_header_right clearfix">
+                <!--<a href="#" class="english_edition" id="edition" style="display:none">English</a>-->
+                <div class="help_wrap">
+                    <a class="hd_menu" href="javascript:void(0);" @click="unSupportNow()">
+                        <s class="help_ico"></s>
+                        <span class="fonttype">帮助中心</span>
+                    </a>
+                </div>
+                <span class="fr fonttype">您好，欢迎登陆中科大软院校友平台！</span>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="isAutoLogin" value="0" />
+    <input type="hidden" id="autoLoginFlag" value="1" />
+    <input type="hidden" id="uuid">
+    <div class="login_wrap">
         <div class="wrap clearfix">
             <div class="mod_login_wrap">
                 <div class="login_pc">
                     <p id="error_tips" class="error_tips fonttype" v-bind:style="error_input">{{error_input_msg}}</p>
                     <div class="clearfix">
                         <h3>软院校友用户登录</h3>
-                        <a href="javascript:void(0);" class="regist_new blue_link" @click="toRister()"><span class="fonttypes">注册新账号</span></a>
+                        <a href="javascript:void(0);" class="regist_new blue_link" @click="toRister()">
+                            <span class="fonttypes">注册新账号</span>
+                        </a>
                     </div>
 
                     <div class="login_form">
@@ -44,13 +47,13 @@
                                 <label class="paswd_ico">&nbsp;</label>
                                 <input id="pwd" type="password" oncopy="return false" onpaste="return false" oncut="return false" oncontextmenu="return false"
                                     name="credentials.password" tabIndex="2" class="ipt ipt_password gay_text" placeholder="密码"
-                                    style="outline: none;" v-model="loginForm.password"/>
+                                    style="outline: none;" v-model="loginForm.password" />
 
                             </div>
 
                             <div class="auto_login clearfix">
                                 <p class="clearfix"></p>
-                                <a href="javascript:void(0);" class="forget_pswd" tabIndex="-1"  @click="unSupportNow()">忘记密码？</a>
+                                <a href="javascript:void(0);" class="forget_pswd" tabIndex="-1" @click="unSupportNow()">忘记密码？</a>
                             </div>
 
                             <button id="login_button" type="button" class="login_btn" @click="login()" @dblclick="dbl_login">登录</button>
@@ -63,17 +66,17 @@
                                 <ul class="account_list clearfix">
                                     <li>
                                         <a href="javascript:void(0);" @click="unSupportNow()">
-                                          <img src="/static/img/qq.png" class="iconfont qq" title="QQ" style="width:40px;height:35px;"></img>
+                                            <img src="/static/img/qq.png" class="iconfont qq" title="QQ" style="width:40px;height:35px;"></img>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" @click="unSupportNow()">
-                                          <img src="/static/img/weixin.png" class="iconfont weixin" title="weixin" style="width:40px;height:35px;"></img>
+                                            <img src="/static/img/weixin.png" class="iconfont weixin" title="weixin" style="width:40px;height:35px;"></img>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="javascript:void(0);" @click="unSupportNow()">
-                                          <img src="/static/img/weibo.png" class="iconfont sina" title="sina" style="width:40px;height:35px;"></img>
+                                            <img src="/static/img/weibo.png" class="iconfont sina" title="sina" style="width:40px;height:35px;"></img>
                                         </a>
                                     </li>
                                 </ul>
@@ -97,15 +100,13 @@
     <div id="simplefooter">
         <p class="fonttype">Copyright © 中科大软院校友平台 2018，All Rights Reserved</p>
     </div>
-    </div>
+</div>
 </template>
 
 <script>
-import { Base64 } from "js-base64";
 export default {
   data: function() {
     return {
-      access_token: this.$store.getters.access_token,
       error_input_msg: "",
       error_input: {
         display: "none"
@@ -128,6 +129,11 @@ export default {
       ]
     };
   },
+  computed: {
+    access_token: function() {
+      return this.$store.getters.access_token;
+    }
+  },
   methods: {
     toRister() {
       this.$router.push("register");
@@ -136,6 +142,23 @@ export default {
       this.$notify.error({
         title: "提示",
         message: "暂不支持该功能!敬请期待!"
+      });
+    },
+    // 以服务的方式调用的 Loading
+    serviceFullscreen(text) {
+      return ELEMENT.Loading.service({
+        lock: true,
+        text: text,
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+    },
+    serviceCloseFullscreen(loadingInstance, time) {
+      return new Promise(function(resolve) {
+        setTimeout(() => {
+          loadingInstance.close();
+          resolve();
+        }, time);
       });
     },
     controlFullscreen(text, time) {
@@ -170,24 +193,27 @@ export default {
           this.passwordmatch[3].test(this.loginForm.password))
       ) {
         this.error_input.display = "none";
+        // 以服务的方式调用的 Loading
+        var loadingInstance = this.serviceFullscreen("正在登陆中....");
         try {
           var res = await this.$store.dispatch("LoginController", {
             user_name: this.loginForm.username,
             password: this.loginForm.password
           });
         } catch (error) {
-          await this.controlFullscreen("正在登陆中....", 1000);
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
+          console.error("LoginController失败!");
           this.$notify.error({
             title: "错误",
             message: "服务器异常或者您的网络异常!"
           });
         }
         if (res.code == 200) {
-          await this.controlFullscreen("正在登陆中....", 1000);
-          await this.controlFullscreen("登陆成功!正在跳转中...", 1000);
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
+          await this.controlFullscreen("登陆成功!即将跳转至登陆页", 1000);
           this.$router.push("main");
         } else {
-          await this.controlFullscreen("正在登陆中....", 1000);
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
           this.error_input.display = "block";
           this.error_input_msg = "账户密码错误!";
         }
@@ -198,12 +224,13 @@ export default {
       }
     }
   },
-  mounted() {
+  created() {
     //本地存有accesstoken并且token没有过期
     if (this.access_token != "") {
       this.$router.push("/main");
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 

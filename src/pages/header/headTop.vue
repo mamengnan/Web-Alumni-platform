@@ -2,7 +2,7 @@
     <div class="header_container">
 		<el-breadcrumb separator="/">
 			<el-breadcrumb-item :to="{ path: '/main' }">首页</el-breadcrumb-item>
-			<el-breadcrumb-item v-for="(item, index) in $route.meta" key="index">{{item}}</el-breadcrumb-item>
+			<el-breadcrumb-item v-for="(item, index) in $route.meta" :item="item" :index="index" :key="index">{{item}}</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-dropdown @command="handleCommand" menu-align='start'>
 			<img :src="defaultimg" class="avator">
@@ -16,11 +16,13 @@
 
 <script>
 export default {
-  data() {
-    return {
-      access_token: this.$store.getters.access_token,
-      defaultimg: "/static/img/default.jpg"
-    };
+  computed: {
+    access_token: function() {
+      return this.$store.getters.access_token;
+    },
+    defaultimg: function() {
+      return this.$store.getters.img_bs64_url;
+    }
   },
   created() {},
   methods: {
@@ -53,10 +55,12 @@ export default {
     async handleCommand(command) {
       if (command == "home") {
         // this.$router.push("/main");
+        // console.log(this.defaultimg);
+        // console.log(this.access_token);
       } else if (command == "singout") {
         this.deleteaccesstoken();
+        this.$store.commit("clearInfomation");
         await this.controlFullscreen("您已成功注销,即将跳转至登陆页...", 1000);
-        this.$store.commit("clearaccesstoken");
         this.$router.push("/");
       }
     }

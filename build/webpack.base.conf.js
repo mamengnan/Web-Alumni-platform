@@ -12,11 +12,10 @@ module.exports = {
     app: './src/main.js'
   },
   externals: {
-    'ElementUI': 'element-ui',
     'vue': 'Vue',
     'vue-router': 'VueRouter',
-    'vue-resource': 'VueResource',
-    'echarts': 'echarts'
+    'vuex': 'Vuex',
+    'vue-resource': 'VueResource'
   },
   output: {
     path: config.build.assetsRoot,
