@@ -1,5 +1,7 @@
-let axios = require("../axios");
+import axios from '../axios'
 import store from './store';
+import convertimg2bs64 from '../../util/global/imgresolver'
+import appconfig from '../../util/config/application'
 
 const actions = {
     // 提交个人信息控制器
@@ -89,6 +91,8 @@ const actions = {
                     }
                 });
                 if (response.data.code == 200) {
+                    response.data.obj.imgurl = response.data.obj.img;
+                    response.data.obj.img = await convertimg2bs64(appconfig.AXIOSIMGURL + response.data.obj.img);
                     if (item) {
                         commit('setuserinfocontroller', response.data);
                     }
@@ -101,6 +105,7 @@ const actions = {
                     });
                 }
             } catch (error) {
+                // console.log(error);
                 on_error({
                     code: 999
                 });

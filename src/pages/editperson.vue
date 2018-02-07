@@ -83,6 +83,8 @@
 import headTop from "./header/headTop.vue";
 import nationJsonArray from "../util/jsonfile/nation.js";
 import appconfig from "../util/config/application";
+import cookie from "../util/cookie";
+import bus from "../util/bus";
 
 export default {
   data: function() {
@@ -92,6 +94,7 @@ export default {
         name: "",
         sex: "",
         img: "/static/img/default.jpg",
+        imgurl: "",
         nation: "",
         home: "",
         political: "",
@@ -231,38 +234,6 @@ export default {
         callback(new Error("请将输入控制在30个字符以内!"));
       }
     },
-    // 以服务的方式调用的 Loading
-    serviceFullscreen(text) {
-      return ELEMENT.Loading.service({
-        lock: true,
-        text: text,
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
-      });
-    },
-    serviceCloseFullscreen(loadingInstance, time) {
-      return new Promise(function(resolve) {
-        setTimeout(() => {
-          loadingInstance.close();
-          resolve();
-        }, time);
-      });
-    },
-    controlFullscreen(text, time) {
-      var self = this;
-      return new Promise(function(resolve) {
-        const loading = self.$loading({
-          lock: true,
-          text: text,
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)"
-        });
-        setTimeout(() => {
-          loading.close();
-          resolve();
-        }, time);
-      });
-    },
     nationFilter(val) {
       if (val) {
         //val存在
@@ -313,9 +284,14 @@ export default {
           this.$refs[formName].validate(async valid => {
             if (valid) {
               let formjson = this.newFormJson();
-              formjson.img = this.getValidImgUrl(
-                this.$refs.temp_upload.uploadFiles[0]
-              );
+              //如果头像没有更换
+              if (this.formData["img"] == this.backUpformData["img"]) {
+                formjson.img = this.formData.imgurl;
+              } else {
+                formjson.img = this.getValidImgUrl(
+                  this.$refs.temp_upload.uploadFiles[0]
+                );
+              }
               // 以服务的方式调用的 Loading
               var loadingInstance = this.serviceFullscreen(
                 "正在提交您的更新...."
@@ -347,6 +323,24 @@ export default {
                   obj: this.newFormJson()
                 });
                 this.resetModify();
+              } else if (res.code == 402) {
+                await this.serviceCloseFullscreen(loadingInstance, 1000);
+                try {
+                  await this.$confirm(
+                    "您的用户登陆信息已失效!点击确定跳转至登陆页",
+                    "提示",
+                    {
+                      confirmButtonText: "确定",
+                      showCancelButton: false,
+                      type: "info",
+                      center: true
+                    }
+                  );
+                } catch (e) {}
+                cookie.delete("access_token", this.access_token);
+                this.$store.commit("clearInfomation");
+                await this.controlFullscreen("即将跳转至登陆页...", 1000);
+                this.$router.push("/");
               }
             } else {
               return false;
@@ -402,7 +396,7 @@ export default {
       };
     },
     tempUploadError(err, file, fileList) {
-      Console.error(err);
+      console.error(err);
     },
     async submitForm(formName) {
       try {
@@ -524,18 +518,13 @@ export default {
     this.nationArray = nationJsonArray;
     this.backUpNationArray = nationJsonArray;
 
-    // todo: 很蠢的办法...因为组件渲染的顺序问题,请求了两次，下次一定优化
-    // 以服务的方式调用的 Loading
-    var loadingInstance = this.serviceFullscreen("正在获取您的个人信息....");
-    try {
-      var res = await this.$store.dispatch("GetUserInfoController", true);
-      if (res.code == 200) {
-        this.resetModify();
-      }
-    } catch (error) {
-      console.error("GetUserInfoController失败!");
-    }
-    loadingInstance.close();
+    this.resetModify();
+
+    var self = this;
+    // 监听组件main.vue载入数据事件
+    bus.$on("dataready", function() {
+      self.resetModify();
+    });
   }
 };
 </script>

@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import bus from "../util/bus";
+
 export default {
   computed: {
     defaultActive: function() {
@@ -71,26 +73,11 @@ export default {
   methods: {
     ToBetaInfo() {
       window.open("/beta4info");
-    },
-    controlFullscreen(text, time) {
-      var self = this;
-      return new Promise(function(resolve) {
-        const loading = self.$loading({
-          lock: true,
-          text: text,
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)"
-        });
-        setTimeout(() => {
-          loading.close();
-          resolve();
-        }, time);
-      });
     }
   },
   created() {
     //token失效
-    if (this.access_token == "") {
+    if (this.access_token == "" || this.access_token == undefined) {
       this.$router.push("/");
     }
   },
@@ -99,6 +86,10 @@ export default {
       var res = await this.$store.dispatch("GetUserInfoController", true);
       if (res.code == 200) {
         this.$store.commit("changeIsNewUser", false);
+        //如果是由子组件传递过来的渲染则触发组件editperson中监听的事件
+        if (window.location.href.includes("/edit")) {
+          bus.$emit("dataready");
+        }
       }
     } catch (error) {
       console.error("GetUserInfoController失败!");

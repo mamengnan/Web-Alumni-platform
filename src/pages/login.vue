@@ -144,38 +144,6 @@ export default {
         message: "暂不支持该功能!敬请期待!"
       });
     },
-    // 以服务的方式调用的 Loading
-    serviceFullscreen(text) {
-      return ELEMENT.Loading.service({
-        lock: true,
-        text: text,
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
-      });
-    },
-    serviceCloseFullscreen(loadingInstance, time) {
-      return new Promise(function(resolve) {
-        setTimeout(() => {
-          loadingInstance.close();
-          resolve();
-        }, time);
-      });
-    },
-    controlFullscreen(text, time) {
-      var self = this;
-      return new Promise(function(resolve) {
-        const loading = self.$loading({
-          lock: true,
-          text: text,
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)"
-        });
-        setTimeout(() => {
-          loading.close();
-          resolve();
-        }, time);
-      });
-    },
     dbl_login() {
       this.login();
     },
@@ -226,7 +194,7 @@ export default {
   },
   created() {
     //本地存有accesstoken并且token没有过期
-    if (this.access_token != "") {
+    if (this.access_token != "" && this.access_token != undefined) {
       this.$router.push("/main");
     }
   },

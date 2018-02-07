@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import cookie from "../../util/cookie";
+
 export default {
   computed: {
     access_token: function() {
@@ -26,39 +28,13 @@ export default {
   },
   created() {},
   methods: {
-    controlFullscreen(text, time) {
-      var self = this;
-      return new Promise(function(resolve) {
-        const loading = self.$loading({
-          lock: true,
-          text: text,
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)"
-        });
-        setTimeout(() => {
-          loading.close();
-          resolve();
-        }, time);
-      });
-    },
-    deleteaccesstoken() {
-      let exp = new Date();
-      exp.setTime(exp.getTime() - 1);
-      window.document.cookie =
-        "access_token" +
-        "=" +
-        this.access_token +
-        ";expires=" +
-        exp.toGMTString();
-    },
-
     async handleCommand(command) {
       if (command == "home") {
         // this.$router.push("/main");
         // console.log(this.defaultimg);
         // console.log(this.access_token);
       } else if (command == "singout") {
-        this.deleteaccesstoken();
+        cookie.delete("access_token", this.access_token);
         this.$store.commit("clearInfomation");
         await this.controlFullscreen("您已成功注销,即将跳转至登陆页...", 1000);
         this.$router.push("/");

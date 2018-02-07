@@ -1,11 +1,11 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 
-// 开发环境下使用vue.js,部署时配置vue.min.js
 // 引入了base64处理函数atob():base64解码 btoa():base64编码
 import App from './App'
 import router from './routers'
-import store from './pages/vuex/store.js'
+import store from './pages/vuex/store'
+import loadingplugin from './util/global/loadingplugin'
 
 console.log("%c _   _ ____ _____ ____   ____                            _____ \n" +
   "| | | / ___|_   _/ ___| |  _ \\ _ __ __ _  __ _  ___  _ _|_   _|__  __ _ _ __ ___\n" +
@@ -16,6 +16,8 @@ console.log("%c _   _ ____ _____ ____   ____                            _____ \n
 
 //设置为 false 以阻止 vue 在启动时生成生产提示。
 Vue.config.productionTip = false
+
+Vue.use(loadingplugin);
 
 /* eslint-disable no-new */
 new Vue({

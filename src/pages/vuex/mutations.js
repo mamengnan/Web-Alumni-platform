@@ -8,6 +8,7 @@ const mutations = {
             name: '',
             sex: '',
             img: '/static/img/default.jpg',
+            imgurl: '',
             nation: '',
             home: '',
             political: '',
