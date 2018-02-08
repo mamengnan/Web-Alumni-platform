@@ -8,6 +8,7 @@ const EditPersonPage = r => require.ensure([], () => r(require('@/pages/editpers
 const PaperPage = r => require.ensure([], () => r(require('@/pages/paper')))
 const InfoBroadCastPage = r => require.ensure([], () => r(require('@/pages/infobroadcast')))
 const ErrorPage = r => require.ensure([], () => r(require('@/pages/error')))
+const VerifyPage = r => require.ensure([], () => r(require('@/pages/verify')))
 const BetaInfoPage = r => require.ensure([], () => r(require('@/pages/beta_info')))
 
 
@@ -42,6 +43,10 @@ export default new VueRouter({
             name: 'BetaInfoPage',
             component: BetaInfoPage
         }, {
+            path: '/verify',
+            name: 'VerifyPage',
+            component: VerifyPage
+        },{
             path: '/*',
             name: 'ErrorPage',
             component: ErrorPage

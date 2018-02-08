@@ -51,6 +51,25 @@
                         <!--提示信息end -->
                     </li>
 
+                    <!--邮箱-->
+                    <li v-bind:class="liclassobjAry[4][1]">
+                        <div class="y_same_item">
+                            <input v-model="email" class="ysame_input" type="text" id="email" @click="selectLi(4)" @keyup.tab="selectLi(4)"/>
+                            <span class="y_same_label" v-bind:style="liclassobjAry[4][2]">邮箱</span>
+
+                        </div>
+                        <div class="y_regist_tips" v-bind:style="liclassobjAry[4][0]" v-bind:class="liclassobjAry[4][3]">
+                            <div class="y_regtip_rel">
+                                <i></i>
+                                <div class="y_tips_words">
+                                    {{infocontentArray[4]}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="y_regist_right"></div>
+                    </li>
+
                     <li v-bind:class="liclassobjAry[1][1]">
                         <div class="y_same_item">
                             <input v-model="phone" class="ysame_input" type="text" id="phone" @click="selectLi(1)" @keyup.tab="selectLi(1)" />
@@ -160,10 +179,11 @@
 export default {
   data: function() {
     return {
-      //手机号正则和账户正则
+      //手机号正则，账户正则，邮箱正则
       othermatch: [
         /^134[0-8]\d{7}$|^13[^4]\d{8}$|^14[5-9]\d{8}$|^15[^4]\d{8}$|^16[6]\d{8}$|^17[0-8]\d{8}$|^18[\d]{9}$|^19[8,9]\d{8}$/,
-        /^[A-Za-z0-9]{6,15}$/
+        /^[A-Za-z0-9]{6,15}$/,
+        /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/
       ],
       //密码正则
       // 弱： 8-16位数字，字母，字符其中两种
@@ -179,14 +199,16 @@ export default {
       twicepassword: "",
       username: "",
       phone: "",
+      email:"",
       password: "",
       beforelastchoose: null,
-      infocontentArray: ["", "", "", ""],
+      infocontentArray: ["", "", "", "",""],
       infocontentconstantAry: [
         "数字和字母，且长度要在6-15位之间",
         "请填写正确的手机号码，以便 接收订单通知，找回密码等",
         "同时含有数字和字母，且长度要在6-16位之间",
-        "请再次输入密码"
+        "请再次输入密码",
+        "请填写正确的邮箱，以便激活账号，找回密码等"
       ],
       safetylevel: [
         {
@@ -254,6 +276,23 @@ export default {
         [
           {
             top: "6px"
+          },
+          {
+            ifocus: false,
+            ipt_wrong: false,
+            ipt_right: false
+          },
+          {
+            left: null
+          },
+          {
+            y_regist_tips_black: true,
+            y_regist_tips_red: false
+          }
+        ],
+        [
+          {
+            top: "-4px"
           },
           {
             ifocus: false,
@@ -484,6 +523,37 @@ export default {
             null
           );
         }
+      }else if (id == 4) {
+        if (this.othermatch[2].test(this.email)) {
+          this.changeState(
+            4,
+            false,
+            false,
+            true,
+            null,
+            "-4px",
+            null,
+            null,
+            null
+          );
+        } else {
+          this.changeState(
+            4,
+            true,
+            true,
+            false,
+            null,
+            "-4px",
+            true,
+            false,
+            null
+          );
+          if (this.email == "") {
+            this.infocontentArray[4] = "邮箱不能为空!";
+          } else {
+            this.infocontentArray[4] = "邮箱格式错误!";
+          }
+        }
       }
     },
     dblsubmit() {
@@ -495,6 +565,8 @@ export default {
         this.checklastselect(0);
       } else if (!this.othermatch[0].test(this.phone)) {
         this.checklastselect(1);
+      }else if (!this.othermatch[2].test(this.email)) {
+        this.checklastselect(4);
       } else if (
         this.password == "" ||
         this.twicepassword == "" ||
@@ -513,7 +585,8 @@ export default {
           var res = await this.$store.dispatch("RegisterController", {
             user_name: this.username,
             password: this.password,
-            phone: this.phone
+            phone: this.phone,
+            email: this.email
           });
         } catch (error) {
           await this.serviceCloseFullscreen(loadingInstance, 1000);
@@ -527,7 +600,7 @@ export default {
         if (res.code == 200) {
           await this.serviceCloseFullscreen(loadingInstance, 1000);
           try {
-            await this.$confirm("注册成功!点击确定后将跳转至登陆界面", "提示", {
+            await this.$confirm("注册成功!点击确定后将跳转至登陆界面！(重要提醒：激活邮件已经发送，请您到邮箱处激活！未激活的账号将无法登陆)", "提示", {
               confirmButtonText: "确定",
               showCancelButton: false,
               type: "success",

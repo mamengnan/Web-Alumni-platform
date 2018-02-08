@@ -180,6 +180,10 @@ export default {
           await this.serviceCloseFullscreen(loadingInstance, 1000);
           await this.controlFullscreen("登陆成功!即将跳转至登陆页", 1000);
           this.$router.push("main");
+        } else if(res.code == 405){
+          await this.serviceCloseFullscreen(loadingInstance, 1000);
+          this.error_input.display = "block";
+          this.error_input_msg = "账户未激活!请到邮箱激活";
         } else {
           await this.serviceCloseFullscreen(loadingInstance, 1000);
           this.error_input.display = "block";
