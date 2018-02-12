@@ -2,7 +2,7 @@
 <div class="manage_page fillcontain">
     <el-row style="height: 100%;">
         <el-col :span="4" style="min-height: 100%; background-color: #324057;">
-            <el-menu :default-active="defaultActive" style="min-height: 100%;" backgroundColor="#324057" textColor="#E4E7ED" router>
+            <el-menu :default-active="defaultActive" class="el-menu-vertical-demo" style="border-right:none;" backgroundColor="#324057" textColor="#E4E7ED" active-text-color="#ffd04b"router>
                 <el-menu-item index="main">
                     <i class="el-icon-menu"></i>首页</el-menu-item>
                 <el-submenu index="2">
@@ -12,7 +12,7 @@
                         </template>
                     <el-menu-item index="paper">
                         <i class="fa fa-handshake-o fa-fw"></i>&nbsp; 论文指导</el-menu-item>
-                    <el-menu-item index="resume" @click="ToBetaInfo()">
+                    <el-menu-item index="resume" @click="toBeta()">
                         <i class="fa fa-id-card-o fa-fw"></i>&nbsp; 简历编写
                         <sup class="el-badge__content is-fixed" style="position:relative;">beta</sup>
                         </el-menu-item>
@@ -46,7 +46,7 @@
                 </el-submenu>
             </el-menu>
         </el-col>
-        <el-col :span="20" style="height: 100%;overflow: auto;">
+        <el-col :span="20" style="height: 100%;overflow: auto; background-color: rgb(246,247,254);">
             <keep-alive>
                 <router-view></router-view>
             </keep-alive>
@@ -56,8 +56,6 @@
 </template>
 
 <script>
-import bus from "../util/bus";
-
 export default {
   computed: {
     defaultActive: function() {
@@ -67,29 +65,22 @@ export default {
       return this.$store.getters.access_token;
     },
     isNewUser: function() {
-      return this.$store.getters.isNewUser;
+      return this.$store.getters["userModule/isNewUser"];
     }
   },
   methods: {
-    ToBetaInfo() {
+    toBeta() {
       window.open("/beta4info");
-    }
-  },
-  created() {
-    //token失效
-    if (this.access_token == "" || this.access_token == undefined) {
-      this.$router.push("/");
     }
   },
   async mounted() {
     try {
-      var res = await this.$store.dispatch("GetUserInfoController", true);
+      var res = await this.$store.dispatch(
+        "userModule/GetUserInfoController",
+        true
+      );
       if (res.code == 200) {
-        this.$store.commit("changeIsNewUser", false);
-        //如果是由子组件传递过来的渲染则触发组件editperson中监听的事件
-        if (window.location.href.includes("/edit")) {
-          bus.$emit("dataready");
-        }
+        this.$store.commit("userModule/changeIsNewUser", false);
       }
     } catch (error) {
       console.error("GetUserInfoController失败!");

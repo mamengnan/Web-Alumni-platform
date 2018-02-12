@@ -6,7 +6,6 @@
                 <img src="/static/img/logo.png" height="55" alt="校友平台" />
             </a>
             <div class="regist_header_right clearfix">
-                <!--<a href="#" class="english_edition" id="edition" style="display:none">English</a>-->
                 <div class="help_wrap">
                     <a class="hd_menu" href="javascript:void(0);" @click="unSupportNow()">
                         <s class="help_ico"></s>
@@ -53,7 +52,7 @@
 
                             <div class="auto_login clearfix">
                                 <p class="clearfix"></p>
-                                <a href="javascript:void(0);" class="forget_pswd" tabIndex="-1" @click="unSupportNow()">忘记密码？</a>
+                                <a href="javascript:void(0);" class="forget_pswd" tabIndex="-1" @click="toFindePsd()">忘记密码？</a>
                             </div>
 
                             <button id="login_button" type="button" class="login_btn" @click="login()" @dblclick="dbl_login">登录</button>
@@ -84,8 +83,6 @@
                         </div>
                     </div>
                 </div>
-                <!--login code-20160613-zhangqian7-S-->
-                <!--login code-E-->
             </div>
             <div class="mod_left_banner">
                 <a id="imgLink" target="_blank">
@@ -135,6 +132,9 @@ export default {
     }
   },
   methods: {
+    toFindePsd() {
+      this.$router.push("findpsd");
+    },
     toRister() {
       this.$router.push("register");
     },
@@ -161,15 +161,12 @@ export default {
           this.passwordmatch[3].test(this.loginForm.password))
       ) {
         this.error_input.display = "none";
-        // 以服务的方式调用的 Loading
-        var loadingInstance = this.serviceFullscreen("正在登陆中....");
         try {
-          var res = await this.$store.dispatch("LoginController", {
+          var res = await this.$store.dispatch("userModule/LoginController", {
             user_name: this.loginForm.username,
             password: this.loginForm.password
           });
         } catch (error) {
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
           console.error("LoginController失败!");
           this.$notify.error({
             title: "错误",
@@ -177,15 +174,12 @@ export default {
           });
         }
         if (res.code == 200) {
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
-          await this.controlFullscreen("登陆成功!即将跳转至登陆页", 1000);
+          await this.controlFullscreen("您已成功登陆,即将跳转至主页...", 600);
           this.$router.push("main");
-        } else if(res.code == 405){
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
+        } else if (res.code == 405) {
           this.error_input.display = "block";
           this.error_input_msg = "账户未激活!请到邮箱激活";
         } else {
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
           this.error_input.display = "block";
           this.error_input_msg = "账户密码错误!";
         }
@@ -194,12 +188,6 @@ export default {
         this.error_input.display = "block";
         this.error_input_msg = "账户密码格式错误!";
       }
-    }
-  },
-  created() {
-    //本地存有accesstoken并且token没有过期
-    if (this.access_token != "" && this.access_token != undefined) {
-      this.$router.push("/main");
     }
   },
   mounted() {}

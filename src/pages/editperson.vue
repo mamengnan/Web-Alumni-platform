@@ -84,7 +84,6 @@ import headTop from "./header/headTop.vue";
 import nationJsonArray from "../util/jsonfile/nation.js";
 import appconfig from "../util/config/application";
 import cookie from "../util/cookie";
-import bus from "../util/bus";
 
 export default {
   data: function() {
@@ -165,10 +164,10 @@ export default {
   },
   computed: {
     backUpformData: function() {
-      return this.$store.getters.formData;
+      return this.$store.getters["userModule/formData"];
     },
     isNewUser: function() {
-      return this.$store.getters.isNewUser;
+      return this.$store.getters["userModule/isNewUser"];
     },
     temp_upload_url: function() {
       return appconfig.TEMPUPLOADRUL;
@@ -292,17 +291,12 @@ export default {
                   this.$refs.temp_upload.uploadFiles[0]
                 );
               }
-              // 以服务的方式调用的 Loading
-              var loadingInstance = this.serviceFullscreen(
-                "正在提交您的更新...."
-              );
               try {
                 var res = await this.$store.dispatch(
-                  "UpdatePfoController",
+                  "userModule/UpdatePfoController",
                   formjson
                 );
               } catch (error) {
-                await this.serviceCloseFullscreen(loadingInstance, 1000);
                 console.error("UpdatePfoController失败!");
                 this.$notify.error({
                   title: "错误",
@@ -310,7 +304,6 @@ export default {
                 });
               }
               if (res.code == 200) {
-                await this.serviceCloseFullscreen(loadingInstance, 1000);
                 this.tmp_upload_param.name = this.getValidImgUrl(
                   this.$refs.temp_upload.uploadFiles[0]
                 );
@@ -319,12 +312,11 @@ export default {
                   message: "更新成功!",
                   type: "success"
                 });
-                this.$store.commit("setuserinfocontroller", {
+                this.$store.commit("userModule/setuserinfocontroller", {
                   obj: this.newFormJson()
                 });
                 this.resetModify();
               } else if (res.code == 402) {
-                await this.serviceCloseFullscreen(loadingInstance, 1000);
                 try {
                   await this.$confirm(
                     "您的用户登陆信息已失效!点击确定跳转至登陆页",
@@ -338,7 +330,8 @@ export default {
                   );
                 } catch (e) {}
                 cookie.delete("access_token", this.access_token);
-                this.$store.commit("clearInfomation");
+                this.$store.commit("clear_accesstoken");
+                this.$store.commit("userModule/clearInfomation");
                 await this.controlFullscreen("即将跳转至登陆页...", 1000);
                 this.$router.push("/");
               }
@@ -411,17 +404,12 @@ export default {
             formjson.img = this.getValidImgUrl(
               this.$refs.temp_upload.uploadFiles[0]
             );
-            // 以服务的方式调用的 Loading
-            var loadingInstance = this.serviceFullscreen(
-              "正在提交您的信息...."
-            );
             try {
               var res = await this.$store.dispatch(
-                "SubmitPfoController",
+                "userModule/SubmitPfoController",
                 formjson
               );
             } catch (error) {
-              await this.serviceCloseFullscreen(loadingInstance, 1000);
               console.error("SubmitPfoController失败!");
               this.$notify.error({
                 title: "错误",
@@ -429,7 +417,6 @@ export default {
               });
             }
             if (res.code == 200) {
-              await this.serviceCloseFullscreen(loadingInstance, 1000);
               this.tmp_upload_param.name = this.getValidImgUrl(
                 this.$refs.temp_upload.uploadFiles[0]
               );
@@ -438,11 +425,11 @@ export default {
                 message: "提交成功!",
                 type: "success"
               });
-              this.$store.commit("setuserinfocontroller", {
+              this.$store.commit("userModule/setuserinfocontroller", {
                 obj: this.newFormJson()
               });
               this.resetModify();
-              this.$store.commit("changeIsNewUser", false);
+              this.$store.commit("userModule/changeIsNewUser", false);
             }
           } else {
             return false;
@@ -450,6 +437,14 @@ export default {
         });
       } catch (error) {
         //此处error是对话框选择叉号的时候需要执行的内容
+      }
+    },
+    resetModifywithparm(backUpformData) {
+      this.resetForm("formData");
+      for (var prop in backUpformData) {
+        if (this.formData.hasOwnProperty(prop)) {
+          this.formData[prop] = backUpformData[prop];
+        }
       }
     },
     resetModify() {
@@ -518,13 +513,11 @@ export default {
     this.nationArray = nationJsonArray;
     this.backUpNationArray = nationJsonArray;
 
+    var res = await this.$store.dispatch(
+      "userModule/GetUserInfoController",
+      true
+    );
     this.resetModify();
-
-    var self = this;
-    // 监听组件main.vue载入数据事件
-    bus.$on("dataready", function() {
-      self.resetModify();
-    });
   }
 };
 </script>

@@ -1,4 +1,9 @@
 export default {
+    set(name, val, expire) {
+        let exdate = new Date();
+        exdate.setTime(expire);
+        window.document.cookie = name + "=" + val + ";expires=" + exdate.toGMTString();
+    },
     get(name) {
         if (window.document.cookie.length > 0) {
             var c_start = window.document.cookie.indexOf(name + "=");

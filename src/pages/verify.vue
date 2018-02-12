@@ -13,20 +13,23 @@
 export default {
   data: function() {
     return {
-        second: 5
+      second: 5,
+      Interval: null
     };
   },
-  methods:{
-      endInterval(){
-          if(this.second == 0){
-              this.$router.push("/");
-          }
-          this.second = this.second - 1;
+  methods: {
+    endInterval() {
+      if (this.second == 0) {
+        clearInterval(this.Interval);
+        this.$router.push("/");
+      } else {
+        this.second = this.second - 1;
       }
+    }
   },
-  mounted(){
+  mounted() {
     //设置定时器，每1秒刷新一次
-    setInterval(this.endInterval,1000);
+    this.Interval = setInterval(this.endInterval, 1000);
   }
 };
 </script>

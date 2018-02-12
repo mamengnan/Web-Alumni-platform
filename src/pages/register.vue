@@ -176,33 +176,29 @@
 </template>
 
 <script>
+import matchObj from "../util/global/matchreg";
+
 export default {
   data: function() {
     return {
       //手机号正则，账户正则，邮箱正则
       othermatch: [
-        /^134[0-8]\d{7}$|^13[^4]\d{8}$|^14[5-9]\d{8}$|^15[^4]\d{8}$|^16[6]\d{8}$|^17[0-8]\d{8}$|^18[\d]{9}$|^19[8,9]\d{8}$/,
-        /^[A-Za-z0-9]{6,15}$/,
-        /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/
+        matchObj.phone_match,
+        matchObj.user_match,
+        matchObj.mail_match
       ],
       //密码正则
       // 弱： 8-16位数字，字母，字符其中两种
       // 中 8-14位    数字，字母，字符其中三种
       // 强 14-16位    数字，字母，字符其中三种
-      passwordmatch: [
-        /^(?!\d+$)(?![a-zA-Z]+$)[\dA-Za-z]{8,16}$/,
-        /^(?!((?=[\x21-\x7e]+)[^A-Za-z0-9])+$)(?![a-zA-Z]+$)[^\u4e00-\u9fa5\d]{8,16}$/,
-        /^(?!((?=[\x21-\x7e]+)[^A-Za-z0-9])+$)(?!\d+$)[^\u4e00-\u9fa5a-zA-Z]{8,16}$/,
-        /^(?=.*((?=[\x21-\x7e]+)[^A-Za-z0-9]))(?=.*[a-zA-Z])(?=.*[0-9])[^\u4e00-\u9fa5]{8,13}$/,
-        /^(?=.*((?=[\x21-\x7e]+)[^A-Za-z0-9]))(?=.*[a-zA-Z])(?=.*[0-9])[^\u4e00-\u9fa5]{14,16}$/
-      ],
+      passwordmatch: matchObj.password_match,
       twicepassword: "",
       username: "",
       phone: "",
-      email:"",
+      email: "",
       password: "",
       beforelastchoose: null,
-      infocontentArray: ["", "", "", "",""],
+      infocontentArray: ["", "", "", "", ""],
       infocontentconstantAry: [
         "数字和字母，且长度要在6-15位之间",
         "请填写正确的手机号码，以便 接收订单通知，找回密码等",
@@ -474,6 +470,7 @@ export default {
         if (
           this.passwordmatch[0].test(this.password) ||
           this.passwordmatch[1].test(this.password) ||
+          this.passwordmatch[2].test(this.password) ||
           this.passwordmatch[3].test(this.password) ||
           this.passwordmatch[4].test(this.password)
         ) {
@@ -523,7 +520,7 @@ export default {
             null
           );
         }
-      }else if (id == 4) {
+      } else if (id == 4) {
         if (this.othermatch[2].test(this.email)) {
           this.changeState(
             4,
@@ -565,7 +562,7 @@ export default {
         this.checklastselect(0);
       } else if (!this.othermatch[0].test(this.phone)) {
         this.checklastselect(1);
-      }else if (!this.othermatch[2].test(this.email)) {
+      } else if (!this.othermatch[2].test(this.email)) {
         this.checklastselect(4);
       } else if (
         this.password == "" ||
@@ -579,17 +576,17 @@ export default {
           this.checklastselect(3);
         }
       } else {
-        // 以服务的方式调用的 Loading
-        var loadingInstance = this.serviceFullscreen("正在注册中....");
         try {
-          var res = await this.$store.dispatch("RegisterController", {
-            user_name: this.username,
-            password: this.password,
-            phone: this.phone,
-            email: this.email
-          });
+          var res = await this.$store.dispatch(
+            "userModule/RegisterController",
+            {
+              user_name: this.username,
+              password: this.password,
+              phone: this.phone,
+              email: this.email
+            }
+          );
         } catch (error) {
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
           console.error("RegisterController失败!");
           this.$notify.error({
             title: "错误",
@@ -598,21 +595,22 @@ export default {
         }
         // success
         if (res.code == 200) {
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
           try {
-            await this.$confirm("注册成功!点击确定后将跳转至登陆界面！(重要提醒：激活邮件已经发送，请您到邮箱处激活！未激活的账号将无法登陆)", "提示", {
-              confirmButtonText: "确定",
-              showCancelButton: false,
-              type: "success",
-              center: true
-            });
+            await this.$confirm(
+              "注册成功!点击确定后将跳转至登陆界面！(重要提醒：激活邮件已经发送，请您到邮箱处激活！未激活的账号将无法登陆)",
+              "提示",
+              {
+                confirmButtonText: "确定",
+                showCancelButton: false,
+                type: "success",
+                center: true
+              }
+            );
           } catch (error) {
             //此处error是对话框选择叉号的时候需要执行的内容
           }
-          await this.controlFullscreen("正在跳转至登陆界面...", 1000);
           this.$router.push("/");
         } else {
-          await this.serviceCloseFullscreen(loadingInstance, 1000);
           this.changeState(
             0,
             true,
@@ -660,12 +658,6 @@ export default {
         this.checklastselect(this.beforelastchoose);
       }
       this.beforelastchoose = id;
-    }
-  },
-  created() {
-    //本地存有accesstoken并且token没有过期
-    if (this.access_token != "" && this.access_token != undefined) {
-      this.$router.push("/main");
     }
   },
   mounted() {}

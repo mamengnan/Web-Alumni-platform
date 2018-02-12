@@ -8,15 +8,6 @@ const getters = {
             state.access_token = cookie.get("access_token");
         }
         return state.access_token;
-    },
-    formData: (state) => {
-        return state.formData;
-    },
-    img_bs64_url: (state) => {
-        return state.img_bs64_url;
-    },
-    isNewUser: (state) => {
-        return state.isNewUser;
     }
 };
 

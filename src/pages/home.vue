@@ -3,7 +3,7 @@
     <headTop></headTop>
     <section class="data_section">
         <header class="section_title">数据统计</header>
-        <el-row :gutter="20" style="margin-bottom: 10px;">
+        <el-row :gutter="20" style="margin-bottom: 20px;">
             <el-col :span="4">
                 <div class="data_list today_head">
                     <span class="data_num head">当日数据：</span>

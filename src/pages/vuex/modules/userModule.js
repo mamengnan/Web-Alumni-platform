@@ -1,0 +1,331 @@
+import cookie from '../../../util/cookie'
+import convertimg2bs64 from '../../../util/global/imgresolver'
+import appconfig from '../../../util/config/application'
+
+// 用户子模块 必须使用namespaced限定命名空间, 以防止污染全局空间
+const userModule = {
+    /** 必须设定namespaced为 true */
+    namespaced: true,
+
+    state: {
+        img_bs64_url: "/static/img/default.jpg",
+        isNewUser: true,
+        formData: {
+            name: '',
+            sex: '',
+            img: '/static/img/default.jpg',
+            imgurl: '',
+            nation: '',
+            home: '',
+            political: '',
+            workstation: '',
+            job: '',
+            undergraduate: '',
+            speciality: '',
+            date1: '',
+            date2: ''
+        }
+    },
+
+    mutations: {
+        changeIsNewUser(state, item) {
+            state.isNewUser = item;
+        },
+        clearInfomation(state) {
+            var temp = {
+                name: '',
+                sex: '',
+                img: '/static/img/default.jpg',
+                imgurl: '',
+                nation: '',
+                home: '',
+                political: '',
+                workstation: '',
+                job: '',
+                undergraduate: '',
+                speciality: '',
+                date1: '',
+                date2: ''
+            };
+            for (var prop in temp) {
+                if (state.formData.hasOwnProperty(prop)) {
+                    state.formData[prop] = temp[prop];
+                }
+            }
+            state.img_bs64_url = "/static/img/default.jpg";
+            state.isNewUser = true;
+        },
+        setuserinfocontroller(state, response) {
+            for (var prop in response.obj) {
+                if (state.formData.hasOwnProperty(prop)) {
+                    if (prop == "sex" || prop == "political") {
+                        state.formData[prop] = response.obj[prop].toString();
+                    } else if (prop == "img") {
+                        state.img_bs64_url = response.obj[prop];
+                        state.formData[prop] = response.obj[prop];
+                    } else if (prop == "date1" || prop == "date2") {
+                        state.formData[prop] = new Date(response.obj[prop]).toGMTString();
+                    } else {
+                        state.formData[prop] = response.obj[prop];
+                    }
+                }
+            }
+        }
+    },
+
+    actions: {
+        // 登陆控制器
+        LoginController({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    var response = await axios.post("/api/token", item);
+                    if (response.data.code == 200) {
+                        cookie.set('access_token', response.data.msg, JSON.parse(atob(response.data.msg.split(".")[0])).timestamp);
+                        rootState.access_token = response.data.msg;
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+        // 注册控制器
+        RegisterController({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    var response = await axios.post("/api/user", item);
+                    if (response.data.code == 200) {
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+        // 提交个人信息控制器
+        SubmitPfoController({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    item.user_id = JSON.parse(atob(rootState.access_token.split(".")[0])).user_id;
+                    var response = await axios({
+                        url: "/api/userinfo",
+                        method: 'post',
+                        data: item,
+                        headers: {
+                            'content-type': 'application/json',
+                            'authorization': rootState.access_token
+                        }
+                    });
+                    if (response.data.code == 200) {
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+
+        // 更改用户基本信息控制器
+        UpdatePfoController({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    item.user_id = JSON.parse(atob(rootState.access_token.split(".")[0])).user_id;
+                    var response = await axios({
+                        url: "/api/userinfo",
+                        method: 'put',
+                        data: item,
+                        headers: {
+                            'content-type': 'application/json',
+                            'authorization': rootState.access_token
+                        }
+                    });
+                    if (response.data.code == 200) {
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+
+        // 修改密码
+        UpdatePassWord({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    var response = await axios({
+                        url: "/api/user",
+                        method: 'put',
+                        data: item,
+                        headers: {
+                            'content-type': 'application/json',
+                            'authorization': rootState.access_token
+                        }
+                    });
+                    rootState.access_token = "";
+                    commit('clearInfomation');
+                    if (response.data.code == 200) {
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+
+        // 判断用户是否存在控制器
+        CheckUserExistController({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    var response = await axios({
+                        url: "/api/user",
+                        method: 'get',
+                        params: {
+                            username: item
+                        },
+                        headers: {
+                            'content-type': 'application/json',
+                        }
+                    });
+                    if (response.data.code == 200) {
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+
+        // 获取用户基本信息控制器
+        GetUserInfoController({
+            state,
+            commit,
+            rootState
+        }, item) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    var response = await axios({
+                        url: "/api/userinfo",
+                        method: 'get',
+                        params: {
+                            id: JSON.parse(atob(rootState.access_token.split(".")[0])).user_id,
+                            return_body: item
+                        },
+                        headers: {
+                            'content-type': 'application/json',
+                            'authorization': rootState.access_token
+                        }
+                    });
+                    if (response.data.code == 200) {
+                        response.data.obj.imgurl = response.data.obj.img;
+                        response.data.obj.img = await convertimg2bs64(appconfig.AXIOSIMGURL + response.data.obj.img);
+                        if (item) {
+                            commit('setuserinfocontroller', response.data);
+                        }
+                        on_result({
+                            code: 200
+                        });
+                    } else {
+                        on_result({
+                            code: response.data.code
+                        });
+                    }
+                } catch (error) {
+                    // console.log(error);
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        }
+    },
+
+    getters: {
+        formData: (state) => {
+            return state.formData;
+        },
+        img_bs64_url: (state) => {
+            return state.img_bs64_url;
+        },
+        isNewUser: (state) => {
+            return state.isNewUser;
+        }
+    }
+}
+
+module.exports = userModule;

@@ -1,11 +1,11 @@
 <template>
-    <div class="header_container">
+    <div class="header_container" style="background-color:#DCDFE6;">
 		<el-breadcrumb separator="/">
 			<el-breadcrumb-item :to="{ path: '/main' }">首页</el-breadcrumb-item>
-			<el-breadcrumb-item v-for="(item, index) in $route.meta" :item="item" :index="index" :key="index">{{item}}</el-breadcrumb-item>
+			<el-breadcrumb-item v-for="(item, index) in $route.meta.info" :item="item" :index="index" :key="index">{{item}}</el-breadcrumb-item>
 		</el-breadcrumb>
 		<el-dropdown @command="handleCommand" menu-align='start'>
-			<img :src="defaultimg" class="avator">
+			<img :src="defaultimg" class="avator" style="width:40px;height:40px;">
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="home">首页</el-dropdown-item>
 				<el-dropdown-item command="singout">退出</el-dropdown-item>
@@ -23,7 +23,7 @@ export default {
       return this.$store.getters.access_token;
     },
     defaultimg: function() {
-      return this.$store.getters.img_bs64_url;
+      return this.$store.getters["userModule/img_bs64_url"];
     }
   },
   created() {},
@@ -35,7 +35,8 @@ export default {
         // console.log(this.access_token);
       } else if (command == "singout") {
         cookie.delete("access_token", this.access_token);
-        this.$store.commit("clearInfomation");
+        this.$store.commit("clear_accesstoken");
+        this.$store.commit("userModule/clearInfomation");
         await this.controlFullscreen("您已成功注销,即将跳转至登陆页...", 1000);
         this.$router.push("/");
       }
