@@ -14,7 +14,6 @@ const userModule = {
             name: '',
             sex: '',
             img: '/static/img/default.jpg',
-            imgurl: '',
             nation: '',
             home: '',
             political: '',
@@ -36,7 +35,6 @@ const userModule = {
                 name: '',
                 sex: '',
                 img: '/static/img/default.jpg',
-                imgurl: '',
                 nation: '',
                 home: '',
                 political: '',
@@ -54,6 +52,7 @@ const userModule = {
             }
             state.img_bs64_url = "/static/img/default.jpg";
             state.isNewUser = true;
+            localStorage.removeItem('user_icon');
         },
         setuserinfocontroller(state, response) {
             for (var prop in response.obj) {
@@ -292,10 +291,17 @@ const userModule = {
                         }
                     });
                     if (response.data.code == 200) {
-                        response.data.obj.imgurl = response.data.obj.img;
-                        response.data.obj.img = await convertimg2bs64(appconfig.AXIOSIMGURL + response.data.obj.img);
                         if (item) {
-                            commit('setuserinfocontroller', response.data);
+                            if (localStorage.getItem('user_icon')) {
+                                response.data.obj.img = localStorage.getItem('user_icon');
+                            } else {
+                                let url = rootState.ali_client.signatureUrl(response.data.obj.id);
+                                response.data.obj.img = await convertimg2bs64(url);
+                                localStorage.setItem('user_icon', response.data.obj.img);
+                            }
+                            if (item) {
+                                commit('setuserinfocontroller', response.data);
+                            }
                         }
                         on_result({
                             code: 200
@@ -306,7 +312,33 @@ const userModule = {
                         });
                     }
                 } catch (error) {
-                    // console.log(error);
+                    console.log(error);
+                    on_error({
+                        code: 999
+                    });
+                }
+            });
+        },
+        // 获取用户头像
+        GetUserIcon({
+            state,
+            commit,
+            rootState
+        }) {
+            return new Promise(async (on_result, on_error) => {
+                try {
+                    if (localStorage.getItem('user_icon')) {
+                        state.img_bs64_url = localStorage.getItem('user_icon');
+                    } else {
+                        let url = rootState.ali_client.signatureUrl(JSON.parse(atob(rootState.access_token.split(".")[0])).user_id);
+                        state.img_bs64_url = await convertimg2bs64(url);
+                        localStorage.setItem('user_icon', state.img_bs64_url);
+                    }
+                    on_result({
+                        code: 200
+                    });
+                } catch (error) {
+                    console.log(error);
                     on_error({
                         code: 999
                     });

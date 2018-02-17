@@ -1,5 +1,6 @@
 const state = {
-    access_token: ""
+    access_token: "",
+    ali_client: null
 };
 
 export default state

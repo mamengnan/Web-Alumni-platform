@@ -19,27 +19,10 @@ Vue.config.productionTip = false
 
 Vue.use(loadingplugin);
 
-
 //如果浏览器不支持trim()方法，做降级处理
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
     return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-  };
-}
-
-//如果浏览器不支持includes()方法，做降级处理
-if (!String.prototype.includes) {
-  String.prototype.includes = function (search, start) {
-    'use strict';
-    if (typeof start !== 'number') {
-      start = 0;
-    }
-
-    if (start + search.length > this.length) {
-      return false;
-    } else {
-      return this.indexOf(search, start) !== -1;
-    }
   };
 }
 

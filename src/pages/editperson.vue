@@ -19,11 +19,11 @@
                         :limit="1">
                         <img :src="formData.img" class="avatar">
                         <el-button slot="trigger" size="small" type="primary">选取头像</el-button>
-                        <div slot="tip" class="el-upload__tip" style="color:#909399;">只能上传jpg/png/gif文件，且不超过1MB</div>
+                        <div slot="tip" class="el-upload__tip" style="color:#909399;">只能上传jpg/png/gif文件，且不超过100KB</div>
                     </el-upload>
                 </el-form-item>
                 <el-form-item v-show="false" label="头像2">
-                    <el-upload class="upload-demo" ref="temp_upload" :headers="tmp_upload_header" :data="tmp_upload_param" :action="temp_upload_url" :auto-upload="false" :show-file-list="false" :limit="1" :on-error="tempUploadError">
+                    <el-upload class="upload-demo" ref="temp_upload" action="" :auto-upload="false" :show-file-list="false" :limit="1" :on-error="tempUploadError">
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="民族" prop="nation">
@@ -93,7 +93,6 @@ export default {
         name: "",
         sex: "",
         img: "/static/img/default.jpg",
-        imgurl: "",
         nation: "",
         home: "",
         political: "",
@@ -156,9 +155,6 @@ export default {
             trigger: "change"
           }
         ]
-      },
-      tmp_upload_param: {
-        name: ""
       }
     };
   },
@@ -169,14 +165,11 @@ export default {
     isNewUser: function() {
       return this.$store.getters["userModule/isNewUser"];
     },
-    temp_upload_url: function() {
-      return appconfig.TEMPUPLOADRUL;
-    },
     access_token: function() {
       return this.$store.getters.access_token;
     },
-    tmp_upload_header: function() {
-      return { authorization: this.$store.getters.access_token };
+    ali_client: function() {
+      return this.$store.getters.ali_client;
     }
   },
   components: {
@@ -250,7 +243,7 @@ export default {
       var self = this;
       return new Promise(function(resolve, error) {
         if (
-          self.$refs.upload.uploadFiles[0].size / 1024 / 1024 < 1 &&
+          self.$refs.upload.uploadFiles[0].size / 1024 < 100 &&
           (self.$refs.upload.uploadFiles[0].raw.type == "image/jpeg" ||
             self.$refs.upload.uploadFiles[0].raw.type == "image/png" ||
             self.$refs.upload.uploadFiles[0].raw.type == "image/gif")
@@ -283,13 +276,12 @@ export default {
           this.$refs[formName].validate(async valid => {
             if (valid) {
               let formjson = this.newFormJson();
-              //如果头像没有更换
-              if (this.formData["img"] == this.backUpformData["img"]) {
-                formjson.img = this.formData.imgurl;
-              } else {
-                formjson.img = this.getValidImgUrl(
-                  this.$refs.temp_upload.uploadFiles[0]
-                );
+              formjson.img = this.getValidImgUrl(
+                this.$refs.temp_upload.uploadFiles[0]
+              );
+              //如果头像更换了就更新图像至oss
+              if (!(this.formData["img"] == this.backUpformData["img"])) {
+                await this.tmp_upload_http();
               }
               try {
                 var res = await this.$store.dispatch(
@@ -304,10 +296,6 @@ export default {
                 });
               }
               if (res.code == 200) {
-                this.tmp_upload_param.name = this.getValidImgUrl(
-                  this.$refs.temp_upload.uploadFiles[0]
-                );
-                this.$refs.temp_upload.submit();
                 this.$message({
                   message: "更新成功!",
                   type: "success"
@@ -316,24 +304,6 @@ export default {
                   obj: this.newFormJson()
                 });
                 this.resetModify();
-              } else if (res.code == 402) {
-                try {
-                  await this.$confirm(
-                    "您的用户登陆信息已失效!点击确定跳转至登陆页",
-                    "提示",
-                    {
-                      confirmButtonText: "确定",
-                      showCancelButton: false,
-                      type: "info",
-                      center: true
-                    }
-                  );
-                } catch (e) {}
-                cookie.delete("access_token", this.access_token);
-                this.$store.commit("clear_accesstoken");
-                this.$store.commit("userModule/clearInfomation");
-                await this.controlFullscreen("即将跳转至登陆页...", 1000);
-                this.$router.push("/");
               }
             } else {
               return false;
@@ -343,34 +313,7 @@ export default {
       } catch (e) {}
     },
     getValidImgUrl(fileimg) {
-      if (fileimg != null && fileimg.hasOwnProperty("raw")) {
-        if (fileimg.raw.type.indexOf("png") != -1) {
-          return (
-            "/static/usericon/" +
-            JSON.parse(atob(this.access_token.split(".")[0])).user_id +
-            ".png"
-          );
-        } else if (fileimg.raw.type.indexOf("jpeg") != -1) {
-          return (
-            "/static/usericon/" +
-            JSON.parse(atob(this.access_token.split(".")[0])).user_id +
-            ".jpeg"
-          );
-        } else if (fileimg.raw.type.indexOf("jpg") != -1) {
-          return (
-            "/static/usericon/" +
-            JSON.parse(atob(this.access_token.split(".")[0])).user_id +
-            ".jpg"
-          );
-        } else if (fileimg.raw.type.indexOf("gif") != -1) {
-          return (
-            "/static/usericon/" +
-            JSON.parse(atob(this.access_token.split(".")[0])).user_id +
-            ".gif"
-          );
-        }
-      }
-      return "/static/img/default.jpg";
+      return "";
     },
     newFormJson() {
       return {
@@ -390,6 +333,26 @@ export default {
     },
     tempUploadError(err, file, fileList) {
       console.error(err);
+    },
+    async tmp_upload_http() {
+      let loadingInstance = this.serviceFullscreen("网络加速中~~");
+      if (
+        this.$refs.temp_upload.uploadFiles[0] != null &&
+        this.$refs.temp_upload.uploadFiles[0] != undefined
+      ) {
+        await this.ali_client.multipartUpload(
+          JSON.parse(atob(this.access_token.split(".")[0])).user_id,
+          this.$refs.temp_upload.uploadFiles[0].raw,
+          {
+            progress: function*(p) {
+              console.log("Progress: " + p);
+            },
+            mime: this.$refs.temp_upload.uploadFiles[0].type
+          }
+        );
+        localStorage.setItem("user_icon", this.formData.img);
+      }
+      this.serviceCloseFullscreen(loadingInstance);
     },
     async submitForm(formName) {
       try {
@@ -417,10 +380,7 @@ export default {
               });
             }
             if (res.code == 200) {
-              this.tmp_upload_param.name = this.getValidImgUrl(
-                this.$refs.temp_upload.uploadFiles[0]
-              );
-              this.$refs.temp_upload.submit();
+              await this.tmp_upload_http();
               this.$message({
                 message: "提交成功!",
                 type: "success"
@@ -473,7 +433,7 @@ export default {
         await this.modifyImg();
       } catch (error) {
         this.$message.error(
-          "上传头像图片只能是 JPG/PNG/GIF 格式且大小必须小于1MB!"
+          "上传头像图片只能是 JPG/PNG/GIF 格式且大小必须小于100KB!"
         );
       }
     },
@@ -490,29 +450,12 @@ export default {
     }
   },
   async mounted() {
-    // 检查浏览器是否支持File API
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-    } else {
-      try {
-        await this.$confirm(
-          "您的浏览器不支持File API,建议您更换新版本的浏览器,以免影响你的使用体验",
-          "提示",
-          {
-            confirmButtonText: "确定",
-            showCancelButton: false,
-            type: "error",
-            center: true
-          }
-        );
-      } catch (error) {
-        //此处error是对话框选择叉号的时候需要执行的内容
-      }
-    }
-
     //浅复制
     this.nationArray = nationJsonArray;
     this.backUpNationArray = nationJsonArray;
 
+    //获取阿里云文件服务器操作权限
+    await this.$store.dispatch("GetAliClient", "sse-ustc-usericon");
     var res = await this.$store.dispatch(
       "userModule/GetUserInfoController",
       true

@@ -8,6 +8,9 @@ const getters = {
             state.access_token = cookie.get("access_token");
         }
         return state.access_token;
+    },
+    ali_client: (state) => {
+        return state.ali_client;
     }
 };
 

@@ -12,7 +12,7 @@
                         </template>
                     <el-menu-item index="paper">
                         <i class="fa fa-handshake-o fa-fw"></i>&nbsp; 论文指导</el-menu-item>
-                    <el-menu-item index="resume" @click="toBeta()">
+                    <el-menu-item index="resume">
                         <i class="fa fa-id-card-o fa-fw"></i>&nbsp; 简历编写
                         <sup class="el-badge__content is-fixed" style="position:relative;">beta</sup>
                         </el-menu-item>
@@ -68,18 +68,18 @@ export default {
       return this.$store.getters["userModule/isNewUser"];
     }
   },
-  methods: {
-    toBeta() {
-      window.open("/beta4info");
-    }
-  },
+  methods: {},
   async mounted() {
     try {
+      //获取阿里云文件服务器操作权限
+      await this.$store.dispatch("GetAliClient", "sse-ustc-usericon");
+      //获取用户基本信息
       var res = await this.$store.dispatch(
         "userModule/GetUserInfoController",
-        true
+        false
       );
       if (res.code == 200) {
+        await this.$store.dispatch("userModule/GetUserIcon");
         this.$store.commit("userModule/changeIsNewUser", false);
       }
     } catch (error) {
