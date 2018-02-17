@@ -15,9 +15,9 @@
 
 ## 未来目标
 
-* 完善用户登陆注册
 * 完成论文代办
 * 完成简历模块
+* 完成直播
 * ......
 
 
@@ -28,13 +28,13 @@ vue2 + vuex + vue-router + axios + webpack + ES6/7 + less + element-ui
 
 # 效果演示
 
-[查看效果请戳这里](http://47.94.229.48/)
+[查看效果请戳这里](http://sse-ustc.oss-cn-beijing.aliyuncs.com)
 
 ##  To get started:
 
      1: 下载代码库, https://git.coding.net/Blust/Web-Alumni-platform.git
      
-     2: 前端开发无需特定IDE，文本编辑器即可。
+     2: 前端开发无需特定IDE，文本编辑器即可(推荐VsCode)。
      
      3: 在本机配置好Node.js开发环境(node,npm)。
      
